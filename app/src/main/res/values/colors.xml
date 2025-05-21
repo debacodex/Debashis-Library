@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="statusBarColor">#FFFFFF</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryVariant">#F5F5F5</color>
+    <color name="colorOnPrimary">#FF4081</color>
+    <color name="colorSecondary">#14000000</color>
+    <color name="colorSecondaryVariant">#FF018786</color>
+    <color name="colorOnSecondary">#FF000000</color>
+    <color name="colorControlNormal">#000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    
+<color name="magic_tab_text">#000000</color>
+<color name="magic_indicator_wrap">#1BFF4081</color>
+<color name="magic_indicator_text">#000000</color>
+<color name="magic_indicator_seleted_text">#FF4081</color>
+<color name="magic_indicator_background">#FFFFFF</color>
+<color name="colorBackground">#000000</color>
+<color name="tab_SelectedTextColor">#FF4081</color>
+
+</resources>
