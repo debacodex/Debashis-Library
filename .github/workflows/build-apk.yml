@@ -1,33 +1,31 @@
-name: Build and Release APK
+name: Build & Publish Release APK
 
-on: [push] # Trigger on push to the default branch (e.g., main, master)
+on:
+  push:
+    tags:
+      - '*'
 
 jobs:
-  build_and_release:
-    runs-on: ubuntu-latest # Use Ubuntu for building
-
+  Gradle:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2 # Checkout your repository code
-      - name: Set up JDK 11 # Set up a compatible Java version
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu' # Or your preferred distribution
-          java-version: 11
-      - name: Generate release APK # Build the release APK
-        run: ./gradlew assembleRelease
-      - name: Create Release on GitHub # Create a new release with the APK
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.sha }} # Use the commit SHA as the tag
-          release_name: Release ${{ github.sha }}
-          draft: false # Set to true to make the release a draft
-          prerelease: false # Set to true for a prerelease
-          body: "New release" # Release description
-
-      - name: Upload APK to release
-        uses: actions/upload-release-artifact@v1
-        with:
-          upload_url: ${{ github.ref_type == 'tag' && github.ref }} # Replace with the actual upload URL
-          file: app/build/outputs/apk/release/app-release.apk # Path to your release APK
-          tag_name: ${{ github.sha }}
-          label: APK Release # Optional label
+    - name: checkout code
+      uses: actions/checkout@v2
+    - name: setup jdk
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Make Gradle executable
+      run: chmod +x ./gradlew
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
+    - name: Releasing using Hub
+      uses: VladDaniliuk/action-release-releaseapk@master
+      env:
+       GITHUB_TOKEN: ${{ secrets.TOKEN }}
+       VERSION_VARIABLE: versionName
+       APP_FILE: buildSrc/Android.kt
+       APP_FOLDER: ./app/release/app.apk
+       CHANGELOG_FILE: ./CHANGELOG.md
+       RELEASE_TITLE: New Build
+       NAME_VARIABLE: app-release.apk
