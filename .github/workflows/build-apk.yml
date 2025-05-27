@@ -1,41 +1,33 @@
-name: Android CI
+name: Build and Release APK
 
-on:
-  pull_request:
-  workflow_dispatch:
+on: [push] # Trigger on push to the default branch (e.g., main, master)
 
 jobs:
-  build:
-    name: Build debug apk
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.5.0
-        with:
-          access_token: ${{ github.token }}
+  build_and_release:
+    runs-on: ubuntu-latest # Use Ubuntu for building
 
-      - uses: actions/checkout@v2
-    
-      - name: set up JDK 11
+    steps:
+      - uses: actions/checkout@v2 # Checkout your repository code
+      - name: Set up JDK 11 # Set up a compatible Java version
         uses: actions/setup-java@v2
         with:
-          java-version: '11'
-          distribution: 'adopt'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build debug apk
-        uses: eskatos/gradle-command-action@v1
+          distribution: 'zulu' # Or your preferred distribution
+          java-version: 11
+      - name: Generate release APK # Build the release APK
+        run: ./gradlew assembleRelease
+      - name: Create Release on GitHub # Create a new release with the APK
+        uses: actions/create-release@v1
         with:
-          arguments: assembleDebug
-          distributions-cache-enabled: true
-          dependencies-cache-enabled: true
-          configuration-cache-enabled: true
+          tag_name: ${{ github.sha }} # Use the commit SHA as the tag
+          release_name: Release ${{ github.sha }}
+          draft: false # Set to true to make the release a draft
+          prerelease: false # Set to true for a prerelease
+          body: "New release" # Release description
 
-      - name: Upload debug apk
-        uses: actions/upload-artifact@v2
+      - name: Upload APK to release
+        uses: actions/upload-release-artifact@v1
         with:
-          name: apk-debug
-          path: app/build/outputs/apk/debug
+          upload_url: ${{ github.ref_type == 'tag' && github.ref }} # Replace with the actual upload URL
+          file: app/build/outputs/apk/release/app-release.apk # Path to your release APK
+          tag_name: ${{ github.sha }}
+          label: APK Release # Optional label
